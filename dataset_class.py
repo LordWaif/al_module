@@ -65,6 +65,7 @@ class DatasetLog:
             self.LABELS = [_ for _ in list(self._dataset.columns) if not _.startswith('_') and not _ == 'text']
         else:
             self.LABELS = labels
+        self.LABEL2INT = lambda x: [self.LABELS.index(i) for i in x if i in self.LABELS]
         
     def set_argilla_config(self,**kwargs):
         self._user = kwargs.get("user")

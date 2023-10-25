@@ -11,10 +11,10 @@ import uuid
 from argilla_functions import createRecords
 
 metricas_front = {'acc':[],'f1':[],'hs':[],'precision':[],'recall':[],'batch':[],'confidence':[],'confidence_query':[]}
-metricas_back = metricas_front.copy()
-metricas_teste = metricas_front.copy()
+metricas_back = {'acc':[],'f1':[],'hs':[],'precision':[],'recall':[],'batch':[],'confidence':[],'confidence_query':[]}
+metricas_teste = {'acc':[],'f1':[],'hs':[],'precision':[],'recall':[],'batch':[],'confidence':[],'confidence_query':[]}
 
-def execute(dataset: DatasetLog, active_learning_base: PoolBasedActiveLearner, rg: argilla, inputs: dict,data_json:dict,logger):
+def execute(dataset: DatasetLog, active_learning_base: PoolBasedActiveLearner, rg: argilla,data_json:dict,logger):
     logger.info(f"Starting Active Learning for {dataset.name}")
     @listener(
         dataset=dataset.name,
@@ -33,7 +33,7 @@ def execute(dataset: DatasetLog, active_learning_base: PoolBasedActiveLearner, r
         if ctx.query_params["isInitial"] and not(data_json['pretraining']):
             logger.info("Pretraining is disabled")
             y = transformY(dados, dataset.LABEL2INT,
-                            len(data_json['training_label']), dataset.multi_label,data_json['training_label'])
+                            len(data_json['training_labels']), dataset.multi_label,data_json['training_labels'])
             ctx.query_params["isInitial"] = False
             indices = np.array([_.id for _ in dados])
             active_learning_base.initialize_data(indices, y)
@@ -41,8 +41,12 @@ def execute(dataset: DatasetLog, active_learning_base: PoolBasedActiveLearner, r
             logger.info(f"Avaliando modelo para o ultimo lote")
             y_true,y_pred,proba_acc = predict(al=active_learning_base,data_json=data_json,data=records,dataset=dataset)
             metricas_front = calcule_metrics(metricas_front,y_true,y_pred,proba_acc,ctx.query_params['batch_id'])
+            metricas_front['confidence_query'].append(np.mean(active_learning_base.query_strategy.base_query_strategy.scores_))
+            pd.DataFrame(metricas_front).to_csv(os.path.join(data_json['metricas_pth'],'metricas_front.csv'),index=False)
             if isinstance(active_learning_base.indices_queried,type(None)):
                 active_learning_base.indices_queried = np.array([_.id for _ in records])
+            y = transformY(records, dataset.LABEL2INT,
+                            len(data_json['training_labels']), dataset.multi_label,data_json['training_labels'])
             logger.info("Training")
             active_learning_base.update(y)
             logger.info(f"Finished training")
@@ -64,17 +68,17 @@ def execute(dataset: DatasetLog, active_learning_base: PoolBasedActiveLearner, r
             teste, return_proba = True
         )
 
-        y_pred_teste = hot_encode(csr_teste,len(data_json['training_label']),dataset.multi_label)
-        y_true_teste = hot_encode(teste.y,len(data_json['training_label']),dataset.multi_label)
+        y_pred_teste = hot_encode(csr_teste,len(data_json['training_labels']),dataset.multi_label)
+        y_true_teste = hot_encode(teste.y,len(data_json['training_labels']),dataset.multi_label)
         metricas_teste = calcule_metrics(metricas_teste,y_true_teste,y_pred_teste,proba_teste,ctx.query_params['batch_id'])
-        metricas_teste['confidence_query'].append(active_learning_base.query_strategy.base_query_strategy.get_mean())
+        metricas_teste['confidence_query'].append(-1)
         pd.DataFrame(metricas_teste).to_csv(os.path.join(data_json['metricas_pth'],'metricas_teste.csv'),index=False)
         # ----------------------
         logger.info(f"Saving {len(records)} records")
         YtoSave = hot_encode(transformY(records, dataset.LABEL2INT,
             dataset.num_classes, dataset.multi_label,dataset.LABELS), dataset.num_classes, dataset.multi_label)
         dataset._dataset.loc[[_records.id for _records in records],dataset.LABELS] = YtoSave
-        dataset._dataset.to_csv('df_historico_bertimbau.csv',index=False)
+        dataset._dataset.to_csv('historico.csv',index=False)
         if ctx.query_params["batch_id"] == 0:
             dataset._dataset.loc[[_records.id for _records in records]].to_csv('registros.csv',index=False)
         else:
@@ -85,27 +89,25 @@ def execute(dataset: DatasetLog, active_learning_base: PoolBasedActiveLearner, r
         queried_indices = active_learning_base.query(
             num_samples=dataset.num_samples
         )
-        metricas_front['confidence_query'].append(active_learning_base.query_strategy.base_query_strategy.get_mean())
-        pd.DataFrame(metricas_front).to_csv(os.path.join(data_json['metricas_pth'],'metricas_front.csv'),index=False)
         dataset._dataset.loc[queried_indices, "_isSend"] = True
 
         # Create new package to send
         new_batch = ctx.query_params["batch_id"] + 1
         new_records = createRecords(
-                dataset, new_batch, queried_indices, rg,inputs
+                dataset, new_batch, queried_indices, rg,data_json['inputs']
         )
-        records_textDataset: TextDataset = createTD(
-            new_records, dataset, data_json['training_field'],data_json['training_label'])
+        records_textDataset: TextDataset = createTD(data_json['training_labels'],
+            new_records, dataset, data_json['training_field'])
         _, proba = active_learning_base.classifier.predict(
             records_textDataset, return_proba=True
         )
         probabilities = []
         for i in proba:
             l = []
-            for lb,j in zip(data_json['training_label'],i):
+            for lb,j in zip(data_json['training_labels'],i):
                 l.append([lb,j])
             probabilities.append(l)
-        restLabels = [i for i in dataset.LABELS+['__control__'] if i not in data_json['training_label']]
+        restLabels = [i for i in dataset.LABELS+['__control__'] if i not in data_json['training_labels']]
         for i in range(len(probabilities)):
             probabilities[i]+=[[j,0.0] for j in restLabels]
             probabilities[i] = [tuple(i) for i in probabilities[i]]

@@ -48,11 +48,11 @@ from small_text import PoolBasedActiveLearner
 from argilla import TextClassificationRecord  
 from typing import List
 def predict(al:PoolBasedActiveLearner,data_json:dict,data:List[TextClassificationRecord],dataset:DatasetLog) -> List[np.ndarray]:
-    records_textDataset: TextDataset = createTD(data_json['training_label'],
+    records_textDataset: TextDataset = createTD(data_json['training_labels'],
                 data, dataset, data_json['training_field'])
     csr_acc, proba_acc = al.classifier.predict(
                 records_textDataset, return_proba=True
             )
-    y_pred = hot_encode(csr_acc, len(data_json['training_label']), dataset.multi_label)
-    y_true = hot_encode(records_textDataset.y, len(data_json['training_label']), dataset.multi_label)
+    y_pred = hot_encode(csr_acc, len(data_json['training_labels']), dataset.multi_label)
+    y_true = hot_encode(records_textDataset.y, len(data_json['training_labels']), dataset.multi_label)
     return y_true,y_pred,proba_acc

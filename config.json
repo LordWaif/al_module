@@ -5,11 +5,11 @@
     },
     "active_learning_config":{
         "query" : "BreakingTies",
-        "num_samples" : 100,
+        "num_samples" : 10,
         "max_interactions" : 1000
     },
     "training_config":{
-        "epochs" : 5,
+        "epochs" : 1,
         "batch" : 4,
         "multi_label" : false
     },
@@ -17,18 +17,18 @@
         "model_name" : "neuralmind/bert-base-portuguese-cased"
     },
     "dataset_config":{
-        "name" : "objetossaude",
-        "pth" : "df_historico.csv"
+        "name" : "testemodulo",
+        "pth" : "historico_novo.csv"
     },
     "inputs" : {
-        "OBJETO":"text",
-        "ID-LICITACAO":"_ID-LICITACAO",
-        "ID-ARQUIVO":"_ID-ARQUIVO"
+        "3OBJETO":"text",
+        "1ID-LICITACAO":"_ID-LICITACAO",
+        "2ID-ARQUIVO":"_ID-ARQUIVO"
     },
-    "training_field" : "OBJETO",
+    "training_field" : "3OBJETO",
     "log_path" : "./logs/",
-    "pretraining" : true,
-    "training_labels" : [],
+    "pretraining" : false,
+    "training_labels" : ["correto"],
     "metricas_pth" : "./metricas/",
     "model_pth" : "./models/",
     "teste_pth" : "./teste_tds.pkl",

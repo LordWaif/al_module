@@ -63,6 +63,6 @@ def initialize_activeLearning(
     """
     query_strategy = SubsamplingQueryStrategy(query)
     active_learner = PoolBasedActiveLearner(
-        factory, query_strategy, dataset.textDataset(True)
+        factory, query_strategy, dataset.textDataset(False)
     )
     return active_learner

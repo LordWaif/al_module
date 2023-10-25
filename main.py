@@ -48,6 +48,9 @@ if __name__ == '__main__':
         pre_data = dataset.dataset[dataset.dataset['_isSend'] == True]
         #pre_data = pre_data.sample(frac=0.05)
         indices = np.array(pre_data.index.to_list())
+        if indices.shape[0] == 0:
+            logger.info("No data to pre training")
+            raise Exception("No data to pre training")
         active_learning_base.initialize_data(indices,pre_data[data_json["training_labels"]].values.reshape(-1))
         active_learning_base.save(os.path.join(data_json['model_pth'],f'modelo_pre_training_{uuid.uuid1().__str__()}_.pkl'))
     if data_json['pretraining']:
@@ -66,7 +69,7 @@ if __name__ == '__main__':
     import argilla as rg
     rg.init(
         api_url= data_json["url"],
-        api_key= data_json["owner"]["key"],
+        api_key= data_json["owner"]["api_key"],
         workspace= data_json["owner"]["workspace"],
     )
     from argilla_functions import initialize_log
@@ -74,6 +77,6 @@ if __name__ == '__main__':
     initialize_log(dataset, rg, 'victor_silva', data_json["inputs"])
     rg.active_client().set_workspace(data_json["workspace_user"])
     function = execute(dataset, active_learning_base,
-                        rg, data_json["inputs"])
+                        rg, data_json,logger)
     function.start()
     function.__current_thread__.join()
