@@ -28,11 +28,27 @@ class DatasetLog:
         self._model_name = kwargs.get("model_name")
 
     def set_training_config(self,**kwargs):
+        """
+        Set the training configuration for the dataset.
+
+        Args:
+        - epochs (int): The number of epochs to train the dataset.
+        - batch (int): The batch size to use during training.
+        - multi_label (bool): Whether the dataset has multiple labels or not.
+        """
         self._epochs = kwargs.get("epochs")
         self._batch = kwargs.get("batch")
         self._multi_label = kwargs.get("multi_label")
 
-    def set_active_learning_config(self,**kwargs):
+    def set_active_learning_config(self, **kwargs):
+        """
+        Set the active learning configuration.
+
+        Args:
+            num_samples (int): The number of samples to be selected in each iteration.
+            max_interactions (int): The maximum number of interactions allowed in the active learning process.
+            query (str): The query strategy to be used in the active learning process.
+        """
         self._num_samples = kwargs.get("num_samples")
         self._max_interactions = kwargs.get("max_interactions")
         self._query = kwargs.get("query")
