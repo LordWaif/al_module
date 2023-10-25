@@ -1,0 +1,37 @@
+{
+    "owner":{
+        "api_key":"owner.apikey",
+        "workspace":"admin"
+    },
+    "active_learning_config":{
+        "query" : "BreakingTies",
+        "num_samples" : 100,
+        "max_interactions" : 1000
+    },
+    "training_config":{
+        "epochs" : 5,
+        "batch" : 4,
+        "multi_label" : false
+    },
+    "model_config":{
+        "model_name" : "neuralmind/bert-base-portuguese-cased"
+    },
+    "dataset_config":{
+        "name" : "objetossaude",
+        "pth" : "df_historico.csv"
+    },
+    "inputs" : {
+        "OBJETO":"text",
+        "ID-LICITACAO":"_ID-LICITACAO",
+        "ID-ARQUIVO":"_ID-ARQUIVO"
+    },
+    "training_field" : "OBJETO",
+    "log_path" : "./logs/",
+    "pretraining" : true,
+    "training_labels" : [],
+    "metricas_pth" : "./metricas/",
+    "model_pth" : "./models/",
+    "teste_pth" : "./teste_tds.pkl",
+    "url" : "http://procyon.tce.pi.gov.br:6902",
+    "workspace_user" : "victor_silva"
+}
