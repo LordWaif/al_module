@@ -5,6 +5,7 @@ data_json = json.load(open("config.json"))
 os.makedirs(data_json['log_path'], exist_ok=True)
 os.makedirs(data_json['metricas_pth'], exist_ok=True)
 os.makedirs(data_json['model_pth'], exist_ok=True)
+os.makedirs(data_json['data_storage'], exist_ok=True)
 
 # LOGGING
 import logging

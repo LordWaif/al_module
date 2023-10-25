@@ -78,11 +78,11 @@ def execute(dataset: DatasetLog, active_learning_base: PoolBasedActiveLearner, r
         YtoSave = hot_encode(transformY(records, dataset.LABEL2INT,
             dataset.num_classes, dataset.multi_label,dataset.LABELS), dataset.num_classes, dataset.multi_label)
         dataset._dataset.loc[[_records.id for _records in records],dataset.LABELS] = YtoSave
-        dataset._dataset.to_csv('historico.csv',index=False)
+        dataset._dataset.to_csv(os.path.join(data_json['data_storage'],'historico.csv'),index=False)
         if ctx.query_params["batch_id"] == 0:
-            dataset._dataset.loc[[_records.id for _records in records]].to_csv('registros.csv',index=False)
+            dataset._dataset.loc[[_records.id for _records in records]].to_csv(os.path.join(data_json['data_storage'],'registros.csv'),index=False)
         else:
-            dataset._dataset.loc[[_records.id for _records in records]].to_csv('registros.csv',mode='a',header=False,index=False)
+            dataset._dataset.loc[[_records.id for _records in records]].to_csv(os.path.join(data_json['data_storage'],'registros.csv'),mode='a',header=False,index=False)
 
         # QUERY
         logger.info(f"Querying for {dataset.num_samples} samples")

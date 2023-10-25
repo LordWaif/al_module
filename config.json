@@ -33,5 +33,6 @@
     "model_pth" : "./models/",
     "teste_pth" : "./teste_tds.pkl",
     "url" : "http://procyon.tce.pi.gov.br:6902",
-    "workspace_user" : "victor_silva"
+    "workspace_user" : "victor_silva",
+    "data_storage" : "./data_csv/"
 }
