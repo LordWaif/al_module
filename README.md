@@ -38,3 +38,9 @@ Modulo para utilização do argilla em conjunto com active learning
 - ``teste_pth`` define o caminho do arquivo de teste, o arquivo de teste deve ser um arquivo de bytes ```pickle`` onde os dados de teste estão previamente rotulados e no formato ``TextDataset``, para mais informações de como gerar o arquivo de teste consulte, **link:** (http://example.com)
 - ``url`` link para uma instancia do argilla funcional a ser utilizada.
 - ``workspace_user`` workspace utilizado para enviar os dados de casa conjunto, note que o workspace já deve existir e usarios pertencentes a ele poderão rotular os dados.
+
+## Dataframe exemplo
+
+text|_link|_dt_criacao|label_1|label_2
+----|-----|-----------|-------|-------
+"Algo deve está aqui" | (http://example.com) |2022-05-10| 0 | 0
