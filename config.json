@@ -5,16 +5,16 @@
     },
     "active_learning_config":{
         "query" : "BreakingTies",
-        "num_samples" : 10,
-        "max_interactions" : 1000
+        "num_samples" : 5,
+        "max_iteractions" : 100
     },
     "training_config":{
         "epochs" : 1,
         "batch" : 4,
-        "multi_label" : false
+        "multi_label" : true
     },
     "model_config":{
-        "model_name" : "neuralmind/bert-base-portuguese-cased"
+        "model_name" : "sentence-transformers/all-MiniLM-L6-v2"
     },
     "dataset_config":{
         "name" : "testemodulo",
@@ -25,13 +25,18 @@
         "1ID-LICITACAO":"_ID-LICITACAO",
         "2ID-ARQUIVO":"_ID-ARQUIVO"
     },
+    "earlyStopping" : {
+        "target_metric" : "f1",
+        "patience" : 2,
+        "threshold" : 0.8
+    },
     "training_field" : "3OBJETO",
     "log_path" : "./logs/",
     "pretraining" : false,
-    "training_labels" : ["correto"],
+    "training_labels" : ["obras e serviços de engenharia","aquisição de bens(permanente)","aquisição de bens(consumo)"],
     "metricas_pth" : "./metricas/",
     "model_pth" : "./models/",
-    "teste_pth" : "./teste_tds.pkl",
+    "teste_pth" : "./test_ml.pkl",
     "url" : "http://procyon.tce.pi.gov.br:6902",
     "workspace_user" : "victor_silva",
     "data_storage" : "./data_csv/"

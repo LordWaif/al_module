@@ -5,7 +5,7 @@ from pathlib import Path
 from argilla.listeners import listener
 from utils import transformY,createTD,hot_encode,_hot_encode,predict
 import numpy as np
-from metrics import calcule_metrics
+from metrics import calcule_metrics,earlyStopping
 import pandas as pd
 import uuid
 from argilla_functions import createRecords
@@ -26,10 +26,11 @@ def execute(dataset: DatasetLog, active_learning_base: PoolBasedActiveLearner, r
         qtd=dataset.num_samples,
     )
     def active_learning_loop(records, ctx):
+        global metricas_front,metricas_back,metricas_teste
         if data_json["active_learning_config"]["max_iteractions"] == ctx.query_params["batch_id"]:
             logger.info("Max iteractions reached")
+            active_learning_loop.stop()
             return
-        global metricas_front,metricas_back,metricas_teste
         logger.info(f"Updating with batch_id {ctx.query_params['batch_id']}")
         dados = rg.load(
                 name=dataset.name, query=f"status:Validated AND metadata.batch_id:<={ctx.query_params['batch_id']}")
@@ -118,4 +119,15 @@ def execute(dataset: DatasetLog, active_learning_base: PoolBasedActiveLearner, r
             new_records[i].prediction = probabilities.pop(0)
         rg.log(records=new_records, name=dataset.name,workspace='victor_silva')
         ctx.query_params["batch_id"] = new_batch
+        # -------------
+        # EarlyStopping
+        # -------------
+        if 'earlyStopping' in data_json:
+            earlyStopping_dict = data_json['earlyStopping']
+            earlyStopping_dict['metrics'] = metricas_teste
+            if earlyStopping(**earlyStopping_dict):
+                logger.info("Early Stopping")
+                logger.info(f"{earlyStopping_dict['target_metric']} = {earlyStopping_dict['metrics'][earlyStopping_dict['target_metric']][-1]}")
+                active_learning_loop.stop()
+                return
     return active_learning_loop
