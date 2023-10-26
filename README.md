@@ -8,17 +8,22 @@ Modulo para utilização do argilla em conjunto com active learning
 ## Instalando dependências
 ``pip install -r requirements.txt``
 
+## Execução
+``python3 main.py``
+
 ## Configuração
 
-- O arquivo ``config.json`` é utilizado para configurar todos os aspectos do sistema.
+### O arquivo ``config.json`` é utilizado para configurar todos os aspectos do sistema, as seguinte chave são usadas para configuração:
 - A chave ``owner`` contêm as informações necessarias para autenticação no argilla, devem ser definidos a chave de api e workspace de um usuario com permissão de criação de dataset no argilla.
-- Em ``active_learning_config`` é definido o metodo de query utilizado o numero de amostras por batch enviados para o argilla e um numero maximo de interações.
+- Em ``active_learning_config`` é definido o metodo de query utilizado o numero de amostras por batch enviados para o argilla e um numero maximo de iterações.
 - Em ``training_config`` são definidos o numero de epocas por rodada do active learning, o tamanho de lote e se será um treinamento multi-label ou não.
 - Em ``model_config`` é definido o modelo de sentence transformer a ser utilizado no treinamento.
 - Em ``dataset_config`` é definido o nome do dataset no argilla e o caminho do arquivo ``.csv`` com os dados a serem utilizados.
   
   **OBS:** o nome do dataset argilla deve conter apenas letras minusculas e sem caracteres especiais.
-- O campo ``inputs`` estrutura o dados a serem mostrados no argilla, a chave de cada campo será o nome utilizado no argilla e o valor é a coluna correspondente no ``.csv`` definido. **Exemplo:** ``"inputs" : {
+- O campo ``inputs`` estrutura o dados a serem mostrados no argilla, a chave de cada campo será o nome utilizado no argilla e o valor é a coluna correspondente no ``.csv`` definido.
+
+  **Exemplo:** ``"inputs" : {
         "OBJETO":"text",
         "ID-LICITACAO":"_ID-LICITACAO",
         "ID-ARQUIVO":"_ID-ARQUIVO"
@@ -35,7 +40,31 @@ Modulo para utilização do argilla em conjunto com active learning
   **OBS:** Atualmente as metricas calculadas são: *acuracia,fi-score,hamming-loss,precisão,recall e confiança de pesquisa*
 
 - ``model_pth`` define a pasta onde o modelo será salvo, a cada rodada de active learning uma nova versão do modelo é salva.
-- ``teste_pth`` define o caminho do arquivo de teste, o arquivo de teste deve ser um arquivo de bytes ```pickle`` onde os dados de teste estão previamente rotulados e no formato ``TextDataset``, para mais informações de como gerar o arquivo de teste consulte, **link:** (http://example.com)
+- ``teste_pth`` define o caminho do arquivo de teste, o arquivo de teste deve ser um arquivo de bytes ``pickle`` onde os dados de teste estão previamente rotulados e no formato *TextDataset*.
+
+  **Exemplo:**
+  
+  ```
+  from test_construct import createTextDataset
+  createTextDataset('test_ml.csv',["label_1","label_2"],True)
+  ```
+  ```
+  (function) def createTextDataset(
+    path_test: str,
+    training_labels: list,
+    multi_label: bool
+  ) -> None
+  Creates a text dataset from a CSV file and saves it as a pickle file.
+  
+  Args:
+  
+  path_test (str): The path to the CSV file.
+  training_labels (list): A list of labels for the training data.
+  multi_label (bool): A boolean indicating whether the dataset has multiple labels.
+  Returns:
+  
+  None
+  ```
 - ``url`` link para uma instancia do argilla funcional a ser utilizada.
 - ``workspace_user`` workspace utilizado para enviar os dados de casa conjunto, note que o workspace já deve existir e usarios pertencentes a ele poderão rotular os dados.
 - ``data_storage`` define a pasta onde os dados rotulados serão salvos, ``registro.csv`` mantêm apenas os registro rotulados onde _isSend será true, ``historico.csv`` mantêm os registros rotulados e não rotulados.
