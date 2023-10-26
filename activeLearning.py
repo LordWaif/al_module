@@ -26,6 +26,9 @@ def execute(dataset: DatasetLog, active_learning_base: PoolBasedActiveLearner, r
         qtd=dataset.num_samples,
     )
     def active_learning_loop(records, ctx):
+        if data_json["active_learning_config"]["max_iteractions"] == ctx.query_params["batch_id"]:
+            logger.info("Max iteractions reached")
+            return
         global metricas_front,metricas_back,metricas_teste
         logger.info(f"Updating with batch_id {ctx.query_params['batch_id']}")
         dados = rg.load(
