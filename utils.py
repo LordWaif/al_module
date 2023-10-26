@@ -5,9 +5,10 @@ from scipy.sparse import csr_matrix
 from dataset_class import DatasetLog
 
 def transformY(records: list,function_label2int:Callable[[Any],List[int]],num_classes: int,isMultiLabel:bool, trainable_labels:list) -> Union[np.ndarray,csr_matrix]:
-    _y = np.array([function_label2int([r for r in rec.annotation if r in trainable_labels]) for rec in records],dtype=object)
+    function = lambda x: [trainable_labels.index(i) for i in x if i in trainable_labels]
+    _y = np.array([function([r for r in rec.annotation if r in trainable_labels]) for rec in records],dtype=object)
     if isMultiLabel:
-        y = list_to_csr(_y, shape=(len(_y), num_classes))
+        y = list_to_csr(_y,shape=(len(_y),num_classes))
     else:
         if len(trainable_labels) == 1:
             _y = np.array([1 if len(_y[i]) != 0 else 0 for i in range(len(_y))])
