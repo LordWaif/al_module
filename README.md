@@ -10,7 +10,7 @@ Modulo para utilização do argilla em conjunto com active learning
 
 ## Configuração
 
-- O arquivo ``config.json`` é utilizado para configurar todos os aspectos do sistema.
+### O arquivo ``config.json`` é utilizado para configurar todos os aspectos do sistema, as seguinte chave são usadas para configuração:
 - A chave ``owner`` contêm as informações necessarias para autenticação no argilla, devem ser definidos a chave de api e workspace de um usuario com permissão de criação de dataset no argilla.
 - Em ``active_learning_config`` é definido o metodo de query utilizado o numero de amostras por batch enviados para o argilla e um numero maximo de interações.
 - Em ``training_config`` são definidos o numero de epocas por rodada do active learning, o tamanho de lote e se será um treinamento multi-label ou não.
