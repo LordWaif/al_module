@@ -8,6 +8,9 @@ Modulo para utilização do argilla em conjunto com active learning
 ## Instalando dependências
 ``pip install -r requirements.txt``
 
+## Execução
+``python3 main.py``
+
 ## Configuração
 
 ### O arquivo ``config.json`` é utilizado para configurar todos os aspectos do sistema, as seguinte chave são usadas para configuração:
@@ -35,7 +38,8 @@ Modulo para utilização do argilla em conjunto com active learning
   **OBS:** Atualmente as metricas calculadas são: *acuracia,fi-score,hamming-loss,precisão,recall e confiança de pesquisa*
 
 - ``model_pth`` define a pasta onde o modelo será salvo, a cada rodada de active learning uma nova versão do modelo é salva.
-- ``teste_pth`` define o caminho do arquivo de teste, o arquivo de teste deve ser um arquivo de bytes ```pickle`` onde os dados de teste estão previamente rotulados e no formato ``TextDataset``, para mais informações de como gerar o arquivo de teste consulte, **link:** (http://example.com)
+- ``teste_pth`` define o caminho do arquivo de teste, o arquivo de teste deve ser um arquivo de bytes ```pickle`` onde os dados de teste estão previamente rotulados e no formato ``TextDataset``, para mais informações de como gerar o arquivo de teste consulte, **link:** 
+ [Geração de teste](https://github.com/LordWaif/al_module/edit/main/README.md#gera%C3%A7%C3%A3o-de-arquivo-de-teste)
 - ``url`` link para uma instancia do argilla funcional a ser utilizada.
 - ``workspace_user`` workspace utilizado para enviar os dados de casa conjunto, note que o workspace já deve existir e usarios pertencentes a ele poderão rotular os dados.
 - ``data_storage`` define a pasta onde os dados rotulados serão salvos, ``registro.csv`` mantêm apenas os registro rotulados onde _isSend será true, ``historico.csv`` mantêm os registros rotulados e não rotulados.
@@ -45,3 +49,5 @@ Modulo para utilização do argilla em conjunto com active learning
 text|_link|_dt_criacao|label_1|label_2
 ----|-----|-----------|-------|-------
 "Algo deve está aqui" | (http://example.com) |2022-05-10| 0 | 0
+
+## Geração de arquivo de teste
