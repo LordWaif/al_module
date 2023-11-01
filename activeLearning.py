@@ -27,6 +27,11 @@ def execute(dataset: DatasetLog, active_learning_base: PoolBasedActiveLearner, r
     )
     def active_learning_loop(records, ctx):
         global metricas_front,metricas_back,metricas_teste
+        if active_learning_base is None:
+            logger.info("No active learning")
+            logger.info(f"Saving {len(records)} records")
+            rg.load(name=dataset.name).to_pandas().to_csv(os.path.join(data_json['data_storage'],'backup_argilla.csv'),index=False)
+            return
         if data_json["active_learning_config"]["max_iteractions"] == ctx.query_params["batch_id"]:
             logger.info("Max iteractions reached")
             active_learning_loop.stop()

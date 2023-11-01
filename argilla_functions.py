@@ -54,7 +54,7 @@ def createRecords(
         )
     return new_records
 
-def initialize_log(dataset: DatasetLog, rg: argilla, workspace: str, inputs: dict) -> None:
+def initialize_log(dataset: DatasetLog, rg: argilla, workspace: str, inputs: dict,isAl:bool) -> None:
     """
     Initializes the logging process for the given dataset using the specified argilla client and workspace.
 
@@ -76,7 +76,7 @@ def initialize_log(dataset: DatasetLog, rg: argilla, workspace: str, inputs: dic
     rg.configure_dataset_settings(
         name=dataset.name, settings=settings, workspace=workspace)
     # Create the initial batch
-    initial_indices = dataset.random_sample()
+    initial_indices = dataset.random_sample(isAl)
     dataset._dataset.loc[initial_indices, "_isSend"] = True
     records = createRecords(dataset, 0, initial_indices, rg, inputs)
     #print(records[0])

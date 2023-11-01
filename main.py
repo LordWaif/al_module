@@ -33,18 +33,19 @@ if __name__ == '__main__':
     dataset.set_label_function()
     dataset.set_active_learning_config(**data_json['active_learning_config'])
     query = queries[dataset.query]()
-    active_learning_base = \
-        initialize_activeLearning(
-            query,
-            dataset,
-            factory(
-                dataset.model_name,
-                2 if len(data_json["training_labels"]) == 1 else len("training_labels"),
-                dataset.epochs,
-                dataset.multi_label,
-                dataset.batch,
-            ),
-        )
+    if data_json['active_learning']:
+        active_learning_base = \
+            initialize_activeLearning(
+                query,
+                dataset,
+                factory(
+                    dataset.model_name,
+                    2 if len(data_json["training_labels"]) == 1 else len("training_labels"),
+                    dataset.epochs,
+                    dataset.multi_label,
+                    dataset.batch,
+                ),
+            )
     def pre_training():
         pre_data = dataset.dataset[dataset.dataset['_isSend'] == True]
         #pre_data = pre_data.sample(frac=0.05)
@@ -54,7 +55,7 @@ if __name__ == '__main__':
             raise Exception("No data to pre training")
         active_learning_base.initialize_data(indices,pre_data[data_json["training_labels"]].values.reshape(-1))
         active_learning_base.save(os.path.join(data_json['model_pth'],f'modelo_pre_training_{uuid.uuid1().__str__()}_.pkl'))
-    if data_json['pretraining']:
+    if data_json['pretraining'] and data_json['active_learning']:
         pre_training()
         import pickle,pandas as pd
         from metrics import calcule_metrics
@@ -71,14 +72,18 @@ if __name__ == '__main__':
     rg.init(
         api_url= data_json["url"],
         api_key= data_json["owner"]["api_key"],
-        workspace= data_json["owner"]["workspace"],
+        workspace= data_json["owner"]["workspace"]
     )
     from argilla_functions import initialize_log
     from activeLearning import execute
-    initialize_log(dataset, rg, 'victor_silva', data_json["inputs"])
+    initialize_log(dataset, rg, 'victor_silva', data_json["inputs"],data_json['active_learning'])
     rg.active_client().set_workspace(data_json["workspace_user"])
-    function = execute(dataset, active_learning_base,
-                        rg, data_json,logger)
+    if data_json['active_learning']:
+        function = execute(dataset, active_learning_base,
+                            rg, data_json,logger)
+    else:
+        function = execute(dataset, None,
+                            rg, data_json,logger)
     function.start()
     function.__current_thread__.join()
     rg.load(name=dataset.name).to_pandas().to_csv(os.path.join(data_json['data_storage'],'backup_argilla.csv'),index=False)

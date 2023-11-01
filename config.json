@@ -39,5 +39,6 @@
     "teste_pth" : "./test_ml.pkl",
     "url" : "http://procyon.tce.pi.gov.br:6902",
     "workspace_user" : "victor_silva",
-    "data_storage" : "./data_csv/"
+    "data_storage" : "./data_csv/",
+    "active_learning" : true
 }

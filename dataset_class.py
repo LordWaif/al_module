@@ -96,8 +96,11 @@ class DatasetLog:
             f"labels=({self.LABELS})>"
         )
     
-    def random_sample(self) -> list:
-        indices =  rd.sample(self._dataset[self._dataset['_isSend']==False].index.to_list(),self._num_samples)
+    def random_sample(self,isAl:bool=True) -> list:
+        if isAl:
+            indices =  rd.sample(self._dataset[self._dataset['_isSend']==False].index.to_list(),self._num_samples)
+        else:
+            indices =  self._dataset.index.to_list()
         self._dataset.loc[indices, "_isSend"] = True
         return indices
     
