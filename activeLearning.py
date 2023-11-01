@@ -34,6 +34,7 @@ def execute(dataset: DatasetLog, active_learning_base: PoolBasedActiveLearner, r
         logger.info(f"Updating with batch_id {ctx.query_params['batch_id']}")
         dados = rg.load(
                 name=dataset.name, query=f"status:Validated AND metadata.batch_id:<={ctx.query_params['batch_id']}")
+        rg.load(name=dataset.name).to_pandas().to_csv(os.path.join(data_json['data_storage'],'backup_argilla.csv'),index=False)
         if ctx.query_params["isInitial"] and not(data_json['pretraining']):
             logger.info("Pretraining is disabled")
             y = transformY(dados, dataset.LABEL2INT,

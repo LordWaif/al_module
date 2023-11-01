@@ -81,3 +81,4 @@ if __name__ == '__main__':
                         rg, data_json,logger)
     function.start()
     function.__current_thread__.join()
+    rg.load(name=dataset.name).to_pandas().to_csv(os.path.join(data_json['data_storage'],'backup_argilla.csv'),index=False)
