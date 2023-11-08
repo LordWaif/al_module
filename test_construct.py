@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import pickle
 from small_text import TextDataset, list_to_csr
+from utils import label_encode
 
 def createTextDataset(path_test:str,training_labels:list,multi_label:bool) -> None:
     """
@@ -32,10 +33,13 @@ def createTextDataset(path_test:str,training_labels:list,multi_label:bool) -> No
         y = list_to_csr(y,shape=(len(y),len(training_labels)))
     else:
         y = test[training_labels].values
-    
+        y = label_encode(y,multi_label)
     teste_tds = TextDataset(x,y,target_labels=np.arange(2 if len(training_labels)== 1 else len(training_labels)))
     
     file = open(path_test.replace('.csv','.pkl'),'wb')
     pickle.dump(teste_tds,file)
     file.close()
+
+if __name__ == '__main__':
+    createTextDataset('teste.csv',["label1","label2","label3","label4"],False)
     

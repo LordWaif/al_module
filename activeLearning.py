@@ -81,8 +81,8 @@ def execute(dataset: DatasetLog, active_learning_base: PoolBasedActiveLearner, r
             teste, return_proba = True
         )
 
-        y_pred_teste = hot_encode(csr_teste,len(data_json['training_labels']),dataset.multi_label)
-        y_true_teste = hot_encode(teste.y,len(data_json['training_labels']),dataset.multi_label)
+        y_pred_teste = csr_teste
+        y_true_teste = teste.y
         metricas_teste = calcule_metrics(metricas_teste,y_true_teste,y_pred_teste,proba_teste,ctx.query_params['batch_id'])
         metricas_teste['confidence_query'].append(-1)
         pd.DataFrame(metricas_teste).to_csv(os.path.join(data_json['metricas_pth'],'metricas_teste.csv'),index=False)
@@ -110,7 +110,7 @@ def execute(dataset: DatasetLog, active_learning_base: PoolBasedActiveLearner, r
                 dataset, new_batch, queried_indices, rg,data_json['inputs']
         )
         records_textDataset: TextDataset = createTD(data_json['training_labels'],
-            new_records, dataset, data_json['training_field'])
+            new_records, dataset, data_json['training_field'],False)
         _, proba = active_learning_base.classifier.predict(
             records_textDataset, return_proba=True
         )

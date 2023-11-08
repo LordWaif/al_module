@@ -11,6 +11,7 @@ os.makedirs(data_json['data_storage'], exist_ok=True)
 import logging
 from pytz import timezone
 from datetime import datetime
+from utils import label_encode
 tz = timezone('America/Fortaleza')
 logger = logging.getLogger('al_logger')
 logger.setLevel(logging.DEBUG)
@@ -54,12 +55,10 @@ if __name__ == '__main__':
             logger.info("No data to pre training")
             raise Exception("No data to pre training")
         y = pre_data[data_json["training_labels"]].values
+        y = label_encode(y,data_json['training_config']['multi_label'])
         if data_json['training_config']['multi_label']:
             from small_text import list_to_csr
-            from utils import label_encode
-            y = label_encode(y)
             y = list_to_csr(y,shape=(y.shape[0],len(data_json["training_labels"])))
-
         active_learning_base.initialize_data(indices,y)
         active_learning_base.save(os.path.join(data_json['model_pth'],f'modelo_pre_training_{uuid.uuid1().__str__()}_.pkl'))
     if data_json['pretraining'] and data_json['active_learning']:

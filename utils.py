@@ -9,13 +9,15 @@ def transformY(records: list,function_label2int:Callable[[Any],List[int]],num_cl
     _y = [function([r for r in rec.annotation if r in trainable_labels]) for rec in records]
     if isMultiLabel:
         y = list_to_csr(_y,shape=(len(_y),num_classes))
+        return y
     else:
         if len(trainable_labels) == 1:
             _y = np.array([1 if len(_y[i]) != 0 else 0 for i in range(len(_y))])
-        y = _y
-    return y
+        y = [i[0] for i in _y]
+        return np.array(y)
+    
 
-def createTD(trainable_labels: List[str], records: List[dict], dataset: DatasetLog, field: str = 'text') -> TextDataset:
+def createTD(trainable_labels: List[str], records: List[dict], dataset: DatasetLog, field: str = 'text',flod:bool = True) -> TextDataset:
     """
     Create a TextDataset object from a list of records and a DatasetLog object.
 
@@ -28,8 +30,14 @@ def createTD(trainable_labels: List[str], records: List[dict], dataset: DatasetL
     Returns:
         TextDataset: TextDataset object containing the inputs and labels.
     """
-    y = transformY(records, dataset.LABEL2INT,
-                   len(trainable_labels), dataset._multi_label, trainable_labels)
+    if not flod:
+        if not dataset.multi_label:
+            y = np.array([0 for _r in range(len(records))])
+        else:
+            y = list_to_csr([[] for _r in range(len(records))],shape=(len(records),len(trainable_labels)))
+    else:
+        y = transformY(records, dataset.LABEL2INT,
+                    len(trainable_labels), dataset._multi_label, trainable_labels)
     td = TextDataset(
         [_.inputs[field] for _ in records],
         y,
@@ -46,8 +54,7 @@ def _hot_encode(y, n_classes:int, isMultiLabel:bool):
             for j in _y:
                 _zeros[i][j] = 1
         else:
-            for j in _y:
-                _zeros[i][j] = 1
+            _zeros[i] = 1
     return _zeros
 
 
@@ -57,10 +64,12 @@ def hot_encode(y:Union[np.ndarray,csr_matrix], n_classes:int, isMultiLabel:bool)
     else:
         return _hot_encode(y, n_classes, isMultiLabel)
     
-def label_encode(y):
+def label_encode(y,isMultiLabel:bool=True):
     matriz_resultante = []
     for _y in y:
         nova_linha = [i for i, valor in enumerate(_y) if valor == 1]
+        if not isMultiLabel:
+            nova_linha = nova_linha[0]
         matriz_resultante.append(nova_linha)
     return np.array(matriz_resultante)
 
@@ -90,6 +99,4 @@ def predict(al: PoolBasedActiveLearner, data_json: Dict[str, any], data: List[Te
     csr_acc, proba_acc = al.classifier.predict(
                 records_textDataset, return_proba=True
             )
-    y_pred = hot_encode(csr_acc, len(data_json['training_labels']), dataset.multi_label)
-    y_true = hot_encode(records_textDataset.y, len(data_json['training_labels']), dataset.multi_label)
-    return y_true,y_pred,proba_acc
+    return csr_acc,records_textDataset.y,proba_acc
