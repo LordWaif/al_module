@@ -40,7 +40,7 @@ if __name__ == '__main__':
                 dataset,
                 factory(
                     dataset.model_name,
-                    2 if len(data_json["training_labels"]) == 1 else len("training_labels"),
+                    2 if len(data_json["training_labels"]) == 1 else len(data_json["training_labels"]),
                     dataset.epochs,
                     dataset.multi_label,
                     dataset.batch,
@@ -53,7 +53,14 @@ if __name__ == '__main__':
         if indices.shape[0] == 0:
             logger.info("No data to pre training")
             raise Exception("No data to pre training")
-        active_learning_base.initialize_data(indices,pre_data[data_json["training_labels"]].values.reshape(-1))
+        y = pre_data[data_json["training_labels"]].values
+        if data_json['training_config']['multi_label']:
+            from small_text import list_to_csr
+            from utils import label_encode
+            y = label_encode(y)
+            y = list_to_csr(y,shape=(y.shape[0],len(data_json["training_labels"])))
+
+        active_learning_base.initialize_data(indices,y)
         active_learning_base.save(os.path.join(data_json['model_pth'],f'modelo_pre_training_{uuid.uuid1().__str__()}_.pkl'))
     if data_json['pretraining'] and data_json['active_learning']:
         pre_training()
@@ -64,8 +71,9 @@ if __name__ == '__main__':
         csr_teste, proba_teste = active_learning_base.classifier.predict(
                 teste, return_proba = True
             )
+        y_pred = teste.y
         metricas_teste = {'acc':[],'f1':[],'hs':[],'precision':[],'recall':[],'batch':[],'confidence':[],'confidence_query':[]}
-        metricas_teste = calcule_metrics(metricas_teste,teste.y,csr_teste,proba_teste,-1)
+        metricas_teste = calcule_metrics(metricas_teste,y_pred,csr_teste,proba_teste,-1)
         metricas_teste['confidence_query'].append(-1)
         pd.DataFrame(metricas_teste).to_csv(os.path.join(data_json['metricas_pth'],'metricas_teste_pre_training.csv'),index=False)
     import argilla as rg

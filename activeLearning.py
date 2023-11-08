@@ -51,7 +51,10 @@ def execute(dataset: DatasetLog, active_learning_base: PoolBasedActiveLearner, r
             logger.info(f"Avaliando modelo para o ultimo lote")
             y_true,y_pred,proba_acc = predict(al=active_learning_base,data_json=data_json,data=records,dataset=dataset)
             metricas_front = calcule_metrics(metricas_front,y_true,y_pred,proba_acc,ctx.query_params['batch_id'])
-            metricas_front['confidence_query'].append(np.mean(active_learning_base.query_strategy.base_query_strategy.scores_))
+            if not data_json['pretraining']:
+                metricas_front['confidence_query'].append(np.mean(active_learning_base.query_strategy.base_query_strategy.scores_))
+            else:
+                metricas_front['confidence_query'].append(-1)
             pd.DataFrame(metricas_front).to_csv(os.path.join(data_json['metricas_pth'],'metricas_front.csv'),index=False)
             if isinstance(active_learning_base.indices_queried,type(None)):
                 active_learning_base.indices_queried = np.array([_.id for _ in records])

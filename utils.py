@@ -6,7 +6,7 @@ from dataset_class import DatasetLog
 
 def transformY(records: list,function_label2int:Callable[[Any],List[int]],num_classes: int,isMultiLabel:bool, trainable_labels:list) -> Union[np.ndarray,csr_matrix]:
     function = lambda x: [trainable_labels.index(i) for i in x if i in trainable_labels]
-    _y = np.array([function([r for r in rec.annotation if r in trainable_labels]) for rec in records],dtype=object)
+    _y = [function([r for r in rec.annotation if r in trainable_labels]) for rec in records]
     if isMultiLabel:
         y = list_to_csr(_y,shape=(len(_y),num_classes))
     else:
@@ -56,6 +56,15 @@ def hot_encode(y:Union[np.ndarray,csr_matrix], n_classes:int, isMultiLabel:bool)
         return _hot_encode(csr_to_list(y), n_classes, isMultiLabel)
     else:
         return _hot_encode(y, n_classes, isMultiLabel)
+    
+def label_encode(y):
+    matriz_resultante = []
+    for _y in y:
+        nova_linha = [i for i, valor in enumerate(_y) if valor == 1]
+        matriz_resultante.append(nova_linha)
+    return np.array(matriz_resultante)
+
+
 
 from small_text import PoolBasedActiveLearner  
 from argilla import TextClassificationRecord  
