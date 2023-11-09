@@ -69,6 +69,7 @@ Modulo para utilização do argilla em conjunto com active learning
 - ``workspace_user``: workspace utilizado para enviar os dados de casa conjunto, note que o workspace já deve existir e usarios pertencentes a ele poderão rotular os dados.
 - ``data_storage``: define a pasta onde os dados rotulados serão salvos, ``registro.csv`` mantêm apenas os registro rotulados onde _isSend será true, ``historico.csv`` mantêm os registros rotulados e não rotulados.
 - ``earlyStopping``*(opcional)*: define o comportamento de earlyStopping, os parametros possivels são *target_metric,patience,threshold* , caso a metrica assistida em *target_metric* não melhore depois de *patience* rodadas, o treinamento é parado. No caso de *threshold* se a metrica ultrapassar esse valor o treinamento é iterrompido, ambos *patience* e *threshold* são opcionais mas caos nenhum seja informado nunca havera condição de parada de earlyStopping.
+- ``active_learning`` : define se de fato será usado active learning, caso seja false todos os dados serão enviados juntos para o argilla e não acontecerá treinamento.
   
   **OBS** Foi considerado o comportamento da metrica ``hamming loss`` que funciona de forma inversa a das outras.
 
