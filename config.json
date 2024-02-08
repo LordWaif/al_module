@@ -1,0 +1,37 @@
+{
+    "owner":{
+        "api_key":"owner.apikey",
+        "workspace":"admin"
+    },
+    "active_learning_config":{
+        "query" : "BreakingTies",
+        "num_samples" : 2,
+        "max_iteractions" : 100
+    },
+    "training_config":{
+        "epochs" : 1,
+        "batch" : 4,
+        "multi_label" : true
+    },
+    "model_config":{
+        "model_name" : "sentence-transformers/all-MiniLM-L6-v2"
+    },
+    "dataset_config":{
+        "name" : "artificial",
+        "pth" : "artificial_dataset_ml.csv"
+    },
+    "inputs" : {
+        "text":"text"
+    },
+    "training_field" : "text",
+    "log_path" : "./logs/",
+    "pretraining" : true,
+    "training_labels" : ["label1","label2"],
+    "metricas_pth" : "./metricas/",
+    "model_pth" : "./models/",
+    "teste_pth" : "./test_ml.pkl",
+    "url" : "http://procyon.tce.pi.gov.br:6902",
+    "workspace_user" : "victor_silva",
+    "data_storage" : "./data_csv/",
+    "active_learning" : false
+}
